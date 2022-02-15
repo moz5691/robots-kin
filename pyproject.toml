@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "robots-kin"
+version = "0.1.0"
+description = ""
+authors = ["Chanho Ahn <moz5691@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.73.0"
+uvicorn = "^0.17.4"
+asyncpg = "^0.25.0"
+tortoise-orm = "^0.18.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.0.1"
+requests = "^2.27.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

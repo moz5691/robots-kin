@@ -1,0 +1,8 @@
+env
+.dockerignore
+Dockerfile
+Dockerfile.prod
+*.md
+*.http
+.gitignore
+
