@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <title>Robot finder</title>
+</head>
+
+<style>
+    body {
+      padding: 30px;
+      margin: auto;
+      font-family: 'Roboto', sans-serif;
+    }
+    input[type=number], select {
+      width: 100%;
+      padding: 12px 20px;
+      margin: 8px 0;
+      display: inline-block;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    input[type=submit] {
+      width: 100%;
+      background-color: #4CAF50;
+      color: white;
+      padding: 14px 20px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    input[type=submit]:hover {
+      background-color: #45a049;
+    }
+    div {
+      border-radius: 5px;
+      background-color: #f2f2f2;
+      padding: 20px;
+    }
+
+    h2{
+        text-align: center;
+    }
+</style>
+
+<body>
+<h2>Robot finder tracked by {{user.given_name}} {{user.family_name}}</h2>
+<div>
+    <form name="robotIdForm" onsubmit="submitForm(event)">
+    <label>Robot ID</label>
+    <input type="number" name="robotIdInput" value="1"/>
+    <input type="submit" value="Submit">
+</form>
+
+</div>
+
+<div id="robotData"></div>
+
+<script type="text/javascript">
+    function submitForm(event){
+        event.preventDefault();
+        let robotId = document.robotIdForm.robotIdInput.value;
+        fetch(`/robots/robot_id/${robotId}/`)
+            .then(response => response.json())
+            .then(data => appendData(data));
+        document.robotIdForm.robotIdInput.value = "";
+    }
+
+    function appendData(data) {
+        let mainContainer = document.getElementById("robotData");
+        mainContainer.innerHTML = "";
+        let divId = document.createElement("div");
+        divId.innerHTML = "Robot ID: " + data.robot_id;
+        mainContainer.appendChild(divId)
+
+        let divCount = document.createElement("div");
+        divCount.innerHTML = "Robots Count: " + data.robots_count;
+        mainContainer.appendChild(divCount)
+
+        for (let i=0; i < data.avg_kk_data.length; i++){
+            let divData = document.createElement("div");
+            divData.innerHTML = `Avg kk_data[${i}]: ` + data.avg_kk_data[i]
+            mainContainer.appendChild(divData)
+        }
+
+    }
+</script>
+</body>
+</html>

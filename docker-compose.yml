@@ -13,7 +13,9 @@ services:
       - TESTING=0
       - DATABASE_URL=postgres://postgres:postgres@robots-db:5432/robots_dev        
       - DATABASE_TEST_URL=postgres://postgres:postgres@robots-db:5432/robots_test
-    depends_on: # new
+      - CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+    depends_on:
       - robots-db
 
   robots-db:

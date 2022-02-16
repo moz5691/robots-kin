@@ -3,6 +3,15 @@
 
 ## Usage
 
+### Enable Google OAuth2, and use your Google ClientId and ClientSecret.  
+Update provided ```.env.example``` and rename it to ```.env```.  ```docker-compose.yml``` uses environmental variables in ```.env``` file.
+
+```
+# .env 
+GOOGLE_CLIENT_ID=bring-your-own
+GOOGLE_CLIENT_SECRET=bring-your-own
+```
+
 ### Run dev environment
 ```shell
 docker-compose up -d --build
@@ -19,9 +28,25 @@ docker-compose exec api python -m pytest
 ```
 
 ### Use Swagger with browser
+Browse with the following url and click on ```OpenAPI```
 ```shell
-http://localhost:8004/docs
+http://localhost:8004
 ```
+![nav_bar](img/nav_bar.png)
+
+The following is screenshot of OpenAPI
+![openapi](img/openapi.png)
+
+Robot tracker is one of feature.  You can track a robot_id and its average location data.
+![tracker](img/tracker.png)
+
+
+## Todos
+
+- [ ] Protect private routes
+- [ ] Pytest
+- [ ] K8s set up
+- [ ] Create Helm Chart
 
 ## Troubleshoot
 

@@ -5,4 +5,4 @@ Dockerfile.prod
 *.md
 *.http
 .gitignore
-
+img/

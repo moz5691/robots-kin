@@ -1,6 +1,6 @@
 from typing import List
 from fastapi import APIRouter, HTTPException
-from src.schemas.robot import RobotResponseSchema, RobotPayloadSchema, Robot, RobotAvgResponseSchema, ErrorResponseSchema
+from src.schemas.robot import RobotResponseSchema, Robot, RobotAvgResponseSchema
 from src.models.robot import RobotSchema
 from src.crud import robots
 
