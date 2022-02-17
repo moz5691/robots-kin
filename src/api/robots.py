@@ -1,9 +1,18 @@
 from typing import List
-from fastapi import APIRouter, HTTPException
-from src.schemas.robot import RobotResponseSchema, Robot, RobotAvgResponseSchema
-from src.models.robot import RobotSchema
-from src.crud import robots
 
+from fastapi import APIRouter, HTTPException
+
+from src.crud import robots
+from src.models.robot import RobotSchema
+
+# isort: off
+from src.schemas.robot import (
+    Robot,
+    RobotAvgResponseSchema,
+    RobotResponseSchema,
+)
+
+# isort: on
 router = APIRouter()
 
 
@@ -20,7 +29,7 @@ async def add_robot(json_payload: Robot):
         "kk_data_4": json_payload.kk_dict.kk_data[4],
         "kk_data_5": json_payload.kk_dict.kk_data[5],
         "kk_data_6": json_payload.kk_dict.kk_data[6],
-        "kk_data_7": json_payload.kk_dict.kk_data[7]
+        "kk_data_7": json_payload.kk_dict.kk_data[7],
     }
 
     res = await robots.post(payload)
@@ -50,11 +59,13 @@ async def get_by_id(id: int) -> RobotSchema:
 
 @router.get("/robot_id/{robot_id}/", response_model=RobotAvgResponseSchema)
 async def get_by_robot_id(robot_id: int) -> RobotAvgResponseSchema:
-    avg_kk_data = [.0] * 8
+    avg_kk_data = [0.0] * 8
     result = await robots.get_by_robot_id(robot_id)
 
     if not result:
-        raise HTTPException(status_code=404, detail=f"Robot id: {robot_id} is not found")
+        raise HTTPException(
+            status_code=404, detail=f"Robot id: {robot_id} is not found"
+        )
 
     robots_count = len(result)
 
@@ -86,7 +97,9 @@ async def delete_by_id(id: int) -> dict:
 async def delete_by_robot_id(robot_id: int):
     result = await robots.get_by_robot_id(robot_id)
     if not result:
-        raise HTTPException(status_code=404, detail=f"Robot id: {robot_id} is not found")
+        raise HTTPException(
+            status_code=404, detail=f"Robot id: {robot_id} is not found"
+        )
     await robots.delete_by_robot_id(robot_id)
 
     return result

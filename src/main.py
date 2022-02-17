@@ -1,8 +1,10 @@
 import logging
+
 from fastapi import FastAPI
-from src.api import health, robots, auth, documents, home
-from src.db import init_db
 from starlette.middleware.sessions import SessionMiddleware
+
+from src.api import auth, documents, health, home, robots
+from src.db import init_db
 
 log = logging.getLogger("uvicorn")
 

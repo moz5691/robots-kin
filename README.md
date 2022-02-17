@@ -27,6 +27,31 @@ docker-compose exec robots-db psql -U postgres
 docker-compose exec api python -m pytest 
 ```
 
+### Code coverage & quality
+- Code test coverage
+```shell
+docker-compose exec api python -m pytest --cov="."
+```
+
+- Linting
+```shell
+docker-compose exec api flake8 .
+```
+
+- Code formatting
+```shell
+docker-compose exec api black . --check
+docker-compose exec api black . --diff
+docker-compose exec api black .
+```
+
+- Sort imports alphabetically
+```shell
+docker-compose exec api isort . --check-only
+docker-compose exec api isort . --diff
+docker-compose exec api isort .
+```
+
 ### Use Swagger with browser
 Browse with the following url and click on ```OpenAPI```
 ```shell

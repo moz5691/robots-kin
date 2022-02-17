@@ -6,3 +6,4 @@ Dockerfile.prod
 *.http
 .gitignore
 img/
+.pytest_cache

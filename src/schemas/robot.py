@@ -1,7 +1,6 @@
-from pydantic import BaseModel
-from datetime import datetime
 from typing import List
-from src.models.robot import RobotSchema
+
+from pydantic import BaseModel
 
 
 class Header(BaseModel):
