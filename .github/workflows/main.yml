@@ -60,7 +60,7 @@ jobs:
         run: |
           docker run -d \
             --name robots-kin \
-            -e PORT=8765
+            -e PORT=8765 \
             -e ENVIRONMENT=dev \
             -e DATABASE_URL=sqlite://sqlite.db \
             -e DATABASE_TEST_URL=sqlite://sqlite.db \
