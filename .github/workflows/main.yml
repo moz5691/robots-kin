@@ -1,13 +1,6 @@
 name: CICD
 
-on:
-  pull_request:
-    branches:
-      - main
-      - 'releases/**'
-  push:
-    branches:
-      - main
+on: [push]
 
 env:
   IMAGE: docker.pkg.github.com/$(echo $GITHUB_REPOSITORY | tr '[A-Z]' '[a-z]')/robots
