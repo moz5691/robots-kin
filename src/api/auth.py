@@ -1,33 +1,32 @@
 import os
-from fastapi import APIRouter, HTTPException
 from typing import Optional
+
+from authlib.integrations.starlette_client import OAuth, OAuthError
+from fastapi import APIRouter, HTTPException
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
-from authlib.integrations.starlette_client import OAuth, OAuthError
 
 router = APIRouter()
 
 oauth = OAuth()
 
-CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
+CONF_URL = "https://accounts.google.com/.well-known/openid-configuration"
 oauth.register(
-    name='google',
+    name="google",
     server_metadata_url=CONF_URL,
-    client_kwargs={
-        'scope': 'openid email profile'
-    },
+    client_kwargs={"scope": "openid email profile"},
     client_id=os.environ.get("CLIENT_ID"),
     client_secret=os.environ.get("CLIENT_SECRET"),
 )
 
 
-@router.get('/login')
+@router.get("/login")
 async def login(request: Request):
-    redirect_uri = request.url_for('auth')  # this creates the url for /auth endpoint
+    redirect_uri = request.url_for("auth")  # this creates the url for /auth endpoint
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
 
-@router.get('/auth')
+@router.get("/auth")
 async def auth(request: Request):
     try:
         access_token = await oauth.google.authorize_access_token(request)
@@ -42,16 +41,16 @@ async def auth(request: Request):
     return RedirectResponse(url="/")
 
 
-@router.get('/logout')
+@router.get("/logout")
 async def logout(request: Request):
-    request.session.pop('user', None)
-    return RedirectResponse(url='/')
+    request.session.pop("user", None)
+    return RedirectResponse(url="/")
 
 
 async def get_user(request: Request) -> Optional[dict]:
-    user = request.session.get('user')
+    user = request.session.get("user")
     if user is not None:
         return user
     else:
-        raise HTTPException(status_code=403, detail='Could not validate credentials.')
+        raise HTTPException(status_code=403, detail="Could not validate credentials.")
     return None

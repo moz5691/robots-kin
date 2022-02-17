@@ -1,8 +1,8 @@
-import datetime
-from typing import List, Union, Any
+from datetime import datetime
+from typing import Any, List, Union
+
 from src.models.robot import RobotSummary
 from src.schemas.robot import RobotPayloadSchema
-from datetime import datetime
 
 
 async def post(payload: RobotPayloadSchema) -> dict[str, Any]:
@@ -38,7 +38,7 @@ async def get_by_id(id: int) -> Union[dict, None]:
     return robot
 
 
-async def get_by_robot_id(robot_id: int) -> Union[List[dict],None]:
+async def get_by_robot_id(robot_id: int) -> Union[List[dict], None]:
     robots = await RobotSummary.filter(robot_id=robot_id).values()
     if len(robots) == 0:
         return None
@@ -54,4 +54,3 @@ async def delete_by_id(id: int) -> int:
 async def delete_by_robot_id(robot_id: int):
     robots = await RobotSummary.filter(robot_id=robot_id).delete()
     return robots
-
