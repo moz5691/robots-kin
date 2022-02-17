@@ -32,3 +32,49 @@ jobs:
       - name: Push image
         run: |
           docker push ${{ env.IMAGE }}:latest
+
+  test:
+    name: Test Docker image
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+        with:
+          ref: main
+      - name: Log in to Github Pkg
+        run: echo ${GITHUB_TOKEN} | docker login -u ${GITHUB_ACTOR} --password-stdin docker.pkg.github.com
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Pull Docker image
+        run: |
+          docker pull ${{ env.IMAGE }}:latest || true
+      - name: Build Docker image
+        run: |
+          docker build \
+            --cache-from ${{ env.IMAGE }}:latest \
+            --tag ${{ env.IMAGE }}:latest \
+            --file ./Dockerfile.prod \
+            "."
+      - name: Run Docker container
+        run: |
+          docker run -d \
+            --name robots-kin \
+            -e PORT=8765
+            -e ENVIRONMENT=dev \
+            -e DATABASE_URL=sqlite://sqlite.db \
+            -e DATABASE_TEST_URL=sqlite://sqlite.db \
+            -p 5003:8765 \
+            ${{ env.IMAGE }}:latest
+      - name: Tests
+        run: |
+          docker exec robots-kin python -m pytest .
+      - name: Linting check
+        run: |
+          docker exec robots-kin python -m flake8 .
+      - name: Formatting check
+        run: |
+          docker exec robots-kin python -m black . --check
+      - name: Import Sorting check
+        run: |
+          docker exec robots-kin python -m isort . --check-only
