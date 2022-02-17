@@ -41,12 +41,75 @@ Robot tracker is one of feature.  You can track a robot_id and its average locat
 ![tracker](img/tracker.png)
 
 
+## Deployment
+
+### Heroku
+
+- Create a new app
+```shell
+$ heroku create
+
+Creating app... done, ⬢ morning-shore-15554
+```
+- Log in to Heroku Container Registry
+```shell
+$ heroku container:login                            
+
+Login Succeeded 
+```
+
+- Provision a Postgres database (with free plan)
+```shell
+$ heroku addons:create heroku-postgresql:hobby-dev --app morning-shore-15554
+
+Creating heroku-postgresql:hobby-dev on ⬢ morning-shore-15554... free
+```
+
+- Build prod image and tag following Heroku registry format
+```shell
+$ dockerbuild -f ../Dockerfile.prod -t registry.heroku.com/mmorning-shore-15554/web .
+
+[+] Building 102.9s (15/15) FINISHED
+```
+
+- Push to Docker registry
+```shell
+$ docker push registry.heroku.com/morning-shore-15554/web:latest
+
+The push refers to repository [registry.heroku.com/morning-shore-15554/web]
+b84f418deff4: Pushed 
+...
+```
+
+- Release the image
+```shell
+$ heroku container:release web --app morning-shore-15554
+
+Releasing images web to morning-shore-15554... done
+
+```
+
+### Google Client ID 
+- Make sure add Authorized JavaScript origins and Authorized redirect URIs are updated accordingy.
+- For ```Authorized redirect URIs```, add ```http://``` uri instead of ```https://``` if HTTPS is not enabled.
+
+![gc_credential](img/gcp_credential.png)
+
+
+### GCP Cloud Run
+
+
+
+
 ## Todos
 
 - [ ] Protect private routes
 - [ ] Pytest
+- [x] Heroku deployment
+- [ ] GCP Cloud Run deployment
 - [ ] K8s set up
 - [ ] Create Helm Chart
+- [ ] GCP GKE deployment
 
 ## Troubleshoot
 
