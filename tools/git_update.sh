@@ -3,7 +3,6 @@
 # https://github.com/antonputra/lesson-087/blob/main/scripts/git_update.sh
 # https://www.youtube.com/watch?v=6dLHcnlPi_U
 
-
 VERSION=""
 
 # get parameters
