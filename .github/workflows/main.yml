@@ -107,10 +107,12 @@ jobs:
             --file ./Dockerfile.prod \
             "."
       - name: Automatic Tagging  of Releases
+        working-directory:
+          scripts
         id: increment-git-tag
         run: |-
-          chmod +x ${GITHUB_WORKSPACE}/.github/git_update.sh
-          bash ${GITHUB_WORKSPACE}/.github/git_update.sh -v minor
+          chmod +x ./git_update.sh
+          bash ./git_update.sh -v minor
       - uses: google-github-actions/setup-gcloud@master
         with:
           service_account_key: ${{ secrets.SERVICE_ACCOUNT_KEY }}
