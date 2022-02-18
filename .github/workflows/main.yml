@@ -1,6 +1,9 @@
 name: CICD
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 env:
   IMAGE: docker.pkg.github.com/$(echo $GITHUB_REPOSITORY | tr '[A-Z]' '[a-z]')/robots-tracker
