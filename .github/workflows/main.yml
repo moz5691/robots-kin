@@ -108,7 +108,7 @@ jobs:
             "."
       - name: Automatic Tagging  of Releases
         working-directory:
-          scripts
+          ./scripts
         id: increment-git-tag
         run: |-
           chmod +x ./git_update.sh
