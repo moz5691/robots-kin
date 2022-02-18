@@ -108,7 +108,8 @@ jobs:
             "."
       - name: Automatic Tagging  of Releases
         id: increment-git-tag
-        run: |
+        run: |-
+          chmod +x ./tools/git_update.sh
           bash ./tools/git_update.sh -v minor
       - uses: google-github-actions/setup-gcloud@master
         with:
