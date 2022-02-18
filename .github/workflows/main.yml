@@ -4,7 +4,7 @@ on: [push]
 
 env:
   IMAGE: docker.pkg.github.com/$(echo $GITHUB_REPOSITORY | tr '[A-Z]' '[a-z]')/robots-tracker
-  GIT_TAG: v0.1.1
+  GIT_TAG: v0.1.2
 
 jobs:
 
@@ -114,11 +114,19 @@ jobs:
       - name: Configure Docker Client
         run: |-
           gcloud auth configure-docker --quiet
+          gcloud auth configure-docker \
+              us-docker.pkg.dev --quiet
       - name: Push Docker image to GCR (Google Container Registry)
         run: |-
           docker tag ${{ env.IMAGE }}:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
           docker tag ${{ env.IMAGE }}:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:${{ env.GIT_TAG }}
           docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
           docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:${{ env.GIT_TAG }}
-        
+      - name: Push Docker image to Artifact Registry (Google Artifact Registry)
+        run: |-
+          docker tag ${{ env.IMAGE }}:latest us-docker.pkg.dev/$PROJECT_ID/$IMAGE_NAME:latest
+          docker tag ${{ env.IMAGE }}:latest us-docker.pkg.dev/$PROJECT_ID/$IMAGE_NAME:${{ env.GIT_TAG }}
+          docker push us-docker.pkg.dev/$PROJECT_ID/$IMAGE_NAME:latest
+          docker push us-docker.pkg.dev/$PROJECT_ID/$IMAGE_NAME:${{ env.GIT_TAG }}
+          
 
