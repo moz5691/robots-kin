@@ -1,4 +1,5 @@
 # Robots Kinematics
+![CICD](https://github.com/moz5691/robots-kin/actions/workflows/main.yml/badge.svg)
 
 
 ## Usage
@@ -144,3 +145,5 @@ Run the following in Python virtual environment if you run into a trouble to run
 ```shell
 pip install cleo tomlkit poetry.core requests cachecontrol cachy html5lib pkginfo virtualenv lockfile
 ```
+
+
