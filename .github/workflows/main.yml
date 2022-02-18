@@ -97,6 +97,10 @@ jobs:
           service_account_key: ${{ secrets.SERVICE_ACCOUNT_KEY }}
           project_id: ${{ env.PROJECT_ID }}
           export_default_credentials: true
+      - name: Log in to Github Pkg
+        run: echo ${GITHUB_TOKEN} | docker login -u ${GITHUB_ACTOR} --password-stdin docker.pkg.github.com
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Pull Docker image
         run: |
           docker pull ${{ env.IMAGE }}:latest || true
