@@ -4,7 +4,7 @@ on: [push]
 
 env:
   IMAGE: docker.pkg.github.com/$(echo $GITHUB_REPOSITORY | tr '[A-Z]' '[a-z]')/robots
-  GIT_TAG: v0.1.0
+  GIT_TAG: v0.1.1
 
 jobs:
 
@@ -87,19 +87,19 @@ jobs:
     env:
       PROJECT_ID: enhanced-mote-341203
       IMAGE_NAME: robots-tracker
-
     steps:
       - name: Checkout
         uses: actions/checkout@v2.4.0
         with:
           ref: main
-
       - uses: google-github-actions/setup-gcloud@master
         with:
           service_account_key: ${{ secrets.SERVICE_ACCOUNT_KEY }}
           project_id: ${{ env.PROJECT_ID }}
           export_default_credentials: true
-
+      - name: Pull Docker image
+        run: |
+          docker pull ${{ env.IMAGE }}:latest || true
       - name: Build Docker image
         run: |
           docker build \
@@ -107,11 +107,9 @@ jobs:
             --tag ${{ env.IMAGE }}:latest \
             --file ./Dockerfile.prod \
             "."
-
       - name: Configure Docker Client
         run: |-
           gcloud auth configure-docker --quiet
-
       - name: Push Docker image to GCR (Google Container Registry)
         run: |-
           docker tag ${{ env.IMAGE }}:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
