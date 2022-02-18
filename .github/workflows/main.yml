@@ -1,9 +1,6 @@
 name: CICD
 
-on:
-  push:
-    branches:
-      - main
+on: [push]
 
 env:
   IMAGE: docker.pkg.github.com/$(echo $GITHUB_REPOSITORY | tr '[A-Z]' '[a-z]')/robots-tracker
@@ -87,6 +84,7 @@ jobs:
     name: Deploy to GCR
     runs-on: ubuntu-latest
     needs: [build, test]
+    if: github.ref == 'refs/heads/main'
     env:
       PROJECT_ID: enhanced-mote-341203
       IMAGE_NAME: robots-tracker
