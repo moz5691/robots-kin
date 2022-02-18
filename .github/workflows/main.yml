@@ -4,7 +4,6 @@ on: [push]
 
 env:
   IMAGE: docker.pkg.github.com/$(echo $GITHUB_REPOSITORY | tr '[A-Z]' '[a-z]')/robots-tracker
-  GIT_TAG: v0.1.2
 
 jobs:
 
@@ -107,6 +106,13 @@ jobs:
             --tag ${{ env.IMAGE }}:latest \
             --file ./Dockerfile.prod \
             "."
+      - name: Automatic Tagging  of Releases
+        working-directory:
+          ../scripts
+        id: increment-git-tag
+        run: |-
+          chmod +x ./git_update.sh
+          bash ./git_update.sh -v minor
       - uses: google-github-actions/setup-gcloud@master
         with:
           service_account_key: ${{ secrets.SERVICE_ACCOUNT_KEY }}
@@ -118,14 +124,18 @@ jobs:
           gcloud auth configure-docker \
               us-east1-docker.pkg.dev --quiet
       - name: Push Docker image to GCR (Google Container Registry)
+        env:
+          GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
         run: |-
           docker tag ${{ env.IMAGE }}:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
-          docker tag ${{ env.IMAGE }}:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:${{ env.GIT_TAG }}
+          docker tag ${{ env.IMAGE }}:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:$GIT_TAG
           docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
-          docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:${{ env.GIT_TAG }}
+          docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$GIT_TAG
       - name: Push Docker image to Artifact Registry (Google Artifact Registry)
+        env:
+          GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
         run: |-
           docker tag ${{ env.IMAGE }}:latest us-east1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:latest
-          docker tag ${{ env.IMAGE }}:latest us-east1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:${{ env.GIT_TAG }}
+          docker tag ${{ env.IMAGE }}:latest us-east1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:$GIT_TAG
           docker push us-east1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:latest
-          docker push us-east1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:${{ env.GIT_TAG }}
+          docker push us-east1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:$GIT_TAG

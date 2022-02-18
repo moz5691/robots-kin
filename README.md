@@ -1,4 +1,5 @@
 # Robots Kinematics
+![CICD](https://github.com/moz5691/robots-kin/actions/workflows/main.yml/badge.svg)
 
 
 ## Usage
@@ -146,4 +147,3 @@ pip install cleo tomlkit poetry.core requests cachecontrol cachy html5lib pkginf
 ```
 
 
-![example workflow](https://github.com/moz5691/robots-kin/actions/workflows/main.yml/badge.svg)
