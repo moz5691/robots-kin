@@ -124,9 +124,9 @@ jobs:
           docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:${{ env.GIT_TAG }}
       - name: Push Docker image to Artifact Registry (Google Artifact Registry)
         run: |-
-          docker tag ${{ env.IMAGE }}:latest us-east1-docker.pkg.dev/$PROJECT_ID/$IMAGE_NAME:latest
-          docker tag ${{ env.IMAGE }}:latest us-east1-docker.pkg.dev/$PROJECT_ID/$IMAGE_NAME:${{ env.GIT_TAG }}
-          docker push us-east1-docker.pkg.dev/$PROJECT_ID/$IMAGE_NAME:latest
-          docker push us-east1-docker.pkg.dev/$PROJECT_ID/$IMAGE_NAME:${{ env.GIT_TAG }}
+          docker tag ${{ env.IMAGE }}:latest us-east1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:latest
+          docker tag ${{ env.IMAGE }}:latest us-east1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:${{ env.GIT_TAG }}
+          docker push us-east1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:latest
+          docker push us-east1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:${{ env.GIT_TAG }}
           
 
