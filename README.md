@@ -2,10 +2,11 @@
 ![CICD](https://github.com/moz5691/robots-kin/actions/workflows/main.yml/badge.svg)
 
 
-## Usage
+## Usage (Local development)
 
 ### Enable Google OAuth2, and use your Google ClientId and ClientSecret.  
-Update provided ```.env.example``` and rename it to ```.env```.  ```docker-compose.yml``` uses environmental variables in ```.env``` file.
+Use provided ```.env.example``` and rename it to ```.env```.  
+```docker-compose.yml``` picks up environmental variables in ```.env``` file by default.
 
 ```
 # .env 
@@ -18,7 +19,7 @@ GOOGLE_CLIENT_SECRET=bring-your-own
 docker-compose up -d --build
 ```
 
-### Run postgres client
+### Run Postgresql client
 ```shell
 docker-compose exec robots-db psql -U postgres
 ```
@@ -67,10 +68,38 @@ Robot tracker is one of feature.  You can track a robot_id and its average locat
 ![tracker](img/tracker.png)
 
 
+## CICD pipeline
+
+Three stages in CICD pipepline.
+In the final stage, we deploy docker container to Google Container Registry and Google Artifact Registry with auto tagging.
+
+Tagging follows standard versioning scheme.  
+
+Version number is increased based on [major|minor|patch].
+
+For example,  1.0.0 -> 2.0.0 for major,  1.0.0 -> 1.1.0 for minor,  1.0.0 -> 1.0.1 for patch.
+
+You can modify the following in ```.github/workflows/main.yaml```.
+```yaml
+      - name: Automatic Tagging  of Releases
+        working-directory:
+          scripts
+        id: increment-git-tag
+        run: |-
+          chmod +x ./git_update.sh
+          bash ./git_update.sh -v minor  <-- change accordingly[major|minior|patch]
+```
+
+
+![cicd-gh-actions](img/cicd-gh-actions.png)
+
+
+
 ## Deployment
 
 ### Heroku
 
+#### Heroku deployment is very simple and easy.  
 - Create a new app
 ```shell
 $ heroku create
@@ -110,10 +139,16 @@ b84f418deff4: Pushed
 - Release the image
 ```shell
 $ heroku container:release web --app morning-shore-15554
-
 Releasing images web to morning-shore-15554... done
-
 ```
+
+- Add environment variables.  Refer ***Google Client ID*** section below.
+    ```
+    CLIENT_ID=
+    CLIENT_SECRET=
+    ```
+  **NOTE**: DATABASE_URL is automatically set by Heroku as we created Postgresql in Heroku.
+
 
 ### Google Client ID 
 - Make sure add Authorized JavaScript origins and Authorized redirect URIs are updated accordingy.
@@ -123,19 +158,80 @@ Releasing images web to morning-shore-15554... done
 
 
 ### GCP Cloud Run
+You should have docker image in both Google Container Registry and Artifact Registry.  
+Use the latest image to deploy in Cloud Run.  You still need to set up the following three environment variable in Cloud Run.
+```
+DATABASE_URL=
+CLIENT_ID=
+CLIENT_SECRET=
+```
 
+
+### GCP GKE via Helm Chart
+
+
+As prerequisites, We need to set up CloudSQLProxy to access CloudSQL from pod(s).   
+
+1. When you create GKE cluster, make sure allow CloudSQL API or allow all Cloud APIs in Access scopes.
+![gke_node_security](img/gke_node_security.png)
+
+    ```shell
+    gcloud container clusters get-credentials [project-id] --zone=[zone]
+    ```
+
+2. Create service account for CloudSql proxy.
+    ```shell
+    gcloud iam service-accounts create cloudsqlproxy
+    ```
+
+3. Binding necessary permissions to access CloudSQL as a client.
+    ```shell
+    gcloud projects add-iam-policy-binding [project-id] \
+    --member serviceAccount:cloudsqlproxy@[project-id].iam.gserviceaccount.com \
+    --role roles/cloudsql.client
+    ```
+
+4. Create a key that service account can use for authentication and download it
+    ```shell
+    gcloud iam service-accounts keys create ./sqlproxy.json \
+    --iam-account cloudsqlproxy@[project-id].iam.gserviceaccount.com
+    ```
+
+5. We want to create ```credentials.json``` 
+    ```shell
+    kubectl create secret generic cloudsql-instance-credentials \
+    --from-file=credentials.json=./sqlproxy.json
+    ```
+
+    **Note**: Detail information is in [cloudsql-proxy github](https://github.com/GoogleCloudPlatform/cloudsql-proxy/tree/main/examples/k8s-sidecar#run-the-cloud-sql-proxy-as-a-sidecar)
+
+6. Helm Chart requires to store sensitive environment variables stored in your local machine and encrypted in run-time.
+    ```shell
+    # store the followingn environment varialbes in local mahcine
+    export DATABASE_URL=
+    export CLIENT_ID=
+    export CLIENT_SECRET=
+    ```
+
+7. Run the following to install.
+    ```shell
+    helm install --set database_url=$DATABASE_URL \
+    --set client_id=$CLIENT_ID \
+    --set client_secret=$CLIENT_SECRET \
+    [chart-name] [chart-path]
+    ```
 
 
 
 ## Todos
 
-- [ ] Protect private routes
+- [x] Protect private routes
 - [ ] Pytest
 - [x] Heroku deployment
-- [ ] GCP Cloud Run deployment
-- [ ] K8s set up
-- [ ] Create Helm Chart
-- [ ] GCP GKE deployment
+- [x] GCP Cloud Run deployment
+- [x] Create Helm Chart
+- [x] GCP GKE deployment with CloudSQL
+
 
 ## Troubleshoot
 

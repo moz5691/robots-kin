@@ -1,0 +1,32 @@
+replicaCount: 3
+
+image:
+  repository: gcr.io/enhanced-mote-341203/robots-tracker
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+name: robots-tracker2
+app: robots-tracker2
+tier: app
+
+database_url: postgres://dummy:dummy@localhost:5432/dummy
+client_id: notworking0hgur.apps.googleusercontent.com
+client_secret: verystrongsecret
+
+
+service:
+  type: LoadBalancer
+  port: 80
+  targetPort: 8000
+  name: robots-tracker2
+  app: robots-tracker2
+  tier: app
+  protocol: TCP
+
+
+proxy:
+  name: cloudsql-proxy
+  image:
+    repository: gcr.io/cloudsql-docker/gce-proxy
+    tag: 1.28.0

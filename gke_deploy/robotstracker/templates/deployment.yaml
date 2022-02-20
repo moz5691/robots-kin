@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}
+  labels:
+    app: {{ .Values.app }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.app }}
+      tier: {{ .Values.tier }}
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app }}
+        tier: {{ .Values.tier }}
+    spec:
+      containers:
+      - name: {{ .Values.name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        env:
+        - name: PORT
+          value: "8000"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              key: database_url
+              name: {{ .Values.name }}-env
+        - name: CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              key: client_id
+              name: {{ .Values.name }}-env
+        - name: CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: client_secret
+              name: {{ .Values.name }}-env
+        ports:
+          - containerPort: 8000
+        livenessProbe:
+          httpGet:
+            path: /health/ping/
+            port: 8000
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            port: 8000
+            path: /health/ping/
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      - name: {{ .Values.proxy.name }}
+        image: {{ .Values.proxy.image.repository }}:{{ .Values.proxy.image.tag }}
+        command:
+          - "/cloud_sql_proxy"
+          - "-instances=enhanced-mote-341203:us-central1:robots-kin-db=tcp:5432"
+          - "-credential_file=/secrets/cloudsql/credentials.json"
+        securityContext:
+          # runAsUser: 2
+          # allowPrivilegeEscalation: false
+          runAsNonRoot: true
+        volumeMounts:
+          - name: cloudsql-instance-credentials
+            mountPath: /secrets/cloudsql
+            readOnly: true
+      volumes:
+        - name: cloudsql-instance-credentials
+          secret:
+            secretName: cloudsql-instance-credentials

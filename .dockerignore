@@ -7,3 +7,4 @@ Dockerfile.prod
 .gitignore
 img/
 .pytest_cache
+k8s/
