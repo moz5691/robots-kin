@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     environment: str = os.getenv("ENVIRONMENT", "dev")
     testing: bool = os.getenv("TESTING", 0)
     database_url: AnyUrl = os.environ.get("DATABASE_URL")
-    auth: os.getenv("AUTH", 1)  # auth default true
+    auth: bool = os.getenv("AUTH", 1)  # auth default true
 
 
 @lru_cache
